@@ -2,7 +2,7 @@
 
 ## Overview
 
-HealthFood is a Flask-based web application that provides personalized meal recommendations based on user health data, dietary preferences, and medical conditions. It features a curated catalog of South Indian restaurants with detailed nutritional information for each menu item.
+NutriMatch is a Flask-based web application that provides personalized meal recommendations based on user health data, dietary preferences, and medical conditions. It features a curated catalog of South Indian restaurants with detailed nutritional information for each menu item.
 
 ## Architecture Diagram
 
@@ -203,3 +203,4 @@ smart-food/
 | /update_cart/<id> | POST | Yes | Update quantity (JSON) |
 | /remove_from_cart/<id> | POST | Yes | Remove item (JSON) |
 | /sync_fitbit | GET | Yes | Fitbit sync (placeholder) |
+
