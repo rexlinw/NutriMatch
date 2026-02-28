@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HealthFood - Smart Nutrition Recommendations</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <div class="landing-page">
+        <nav class="navbar">
+            <div class="container">
+                <div class="nav-brand">
+                    <h1>🥗 HealthFood</h1>
+                </div>
+                <div class="nav-links">
+                    <a href="{{ url_for('login') }}" class="btn btn-outline">Login</a>
+                    <a href="{{ url_for('register') }}" class="btn btn-primary">Sign Up</a>
+                </div>
+            </div>
+        </nav>
+
+        <section class="hero">
+            <div class="container">
+                <div class="hero-content">
+                    <h1 class="hero-title">Eat Smart, Live Healthy</h1>
+                    <p class="hero-subtitle">Get personalized food recommendations based on your health data</p>
+                    <div class="hero-buttons">
+                        <a href="{{ url_for('register') }}" class="btn btn-large btn-primary">Get Started</a>
+                        <a href="#features" class="btn btn-large btn-outline">Learn More</a>
+                    </div>
+                </div>
+                <div class="hero-image">
+                    <img src="https://images.unsplash.com/photo-1498837167922-ddd27525d352?w=600" alt="Healthy Food">
+                </div>
+            </div>
+        </section>
+
+        <section id="features" class="features">
+            <div class="container">
+                <h2 class="section-title">Why Choose HealthFood?</h2>
+                <div class="features-grid">
+                    <div class="feature-card">
+                        <div class="feature-icon">📊</div>
+                        <h3>Health Tracking</h3>
+                        <p>Track your health metrics manually or sync with Fitbit</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">🤖</div>
+                        <h3>AI Recommendations</h3>
+                        <p>Get personalized meal suggestions based on your health goals</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">🍽️</div>
+                        <h3>Curated Restaurants</h3>
+                        <p>Choose from top-rated healthy restaurants</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">🎯</div>
+                        <h3>Dietary Preferences</h3>
+                        <p>Filter by vegetarian, vegan, gluten-free & more</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <footer class="footer">
+            <div class="container">
+                <p>&copy; 2024 HealthFood. All rights reserved.</p>
+            </div>
+        </footer>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+</body>
+</html>

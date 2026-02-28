@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Home - HealthFood</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    {% include 'navbar.html' %}
+
+    <div class="main-content">
+        <div class="container">
+            <div class="page-header">
+                <h1>Discover Restaurants</h1>
+                <p>Choose from our curated selection of healthy dining options</p>
+            </div>
+
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for category, message in messages %}
+                        <div class="alert alert-{{ category }}">{{ message }}</div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+
+            <div class="restaurants-grid">
+                {% for restaurant in restaurants %}
+                <div class="restaurant-card">
+                    <div class="restaurant-image">
+                        <img src="{{ restaurant.image_url }}" alt="{{ restaurant.name }}">
+                        <div class="restaurant-rating">
+                            <span>⭐ {{ restaurant.rating }}</span>
+                        </div>
+                    </div>
+                    <div class="restaurant-info">
+                        <h3>{{ restaurant.name }}</h3>
+                        <p class="cuisine-type">{{ restaurant.cuisine_type }}</p>
+                        <p class="restaurant-desc">{{ restaurant.description }}</p>
+                        <a href="{{ url_for('restaurant_menu', restaurant_id=restaurant.id) }}" 
+                           class="btn btn-primary btn-block">View Menu</a>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+</body>
+</html>

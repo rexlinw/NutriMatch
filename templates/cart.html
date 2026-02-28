@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cart - HealthFood</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    {% include 'navbar.html' %}
+
+    <div class="main-content">
+        <div class="container">
+            <h1>Your Cart</h1>
+
+            {% if cart_items %}
+            <div class="cart-container">
+                <div class="cart-items">
+                    {% for item in cart_items %}
+                    <div class="cart-item" data-cart-id="{{ item.id }}">
+                        <img src="{{ item.menu_item.image_url }}" alt="{{ item.menu_item.name }}" class="cart-item-image">
+                        
+                        <div class="cart-item-details">
+                            <h3>{{ item.menu_item.name }}</h3>
+                            <p class="restaurant-name">{{ item.menu_item.restaurant.name }}</p>
+                            <p class="item-price">₹{{ "%.2f"|format(item.menu_item.price) }}</p>
+                        </div>
+                        
+                        <div class="cart-item-nutrition">
+                            <span>{{ (item.menu_item.calories * item.quantity)|int }} cal</span>
+                            <span>{{ (item.menu_item.protein * item.quantity)|int }}g protein</span>
+                        </div>
+                        
+                        <div class="cart-item-quantity">
+                            <button class="qty-btn" onclick="updateQuantity({{ item.id }}, {{ item.quantity - 1 }})">-</button>
+                            <span class="qty-display">{{ item.quantity }}</span>
+                            <button class="qty-btn" onclick="updateQuantity({{ item.id }}, {{ item.quantity + 1 }})">+</button>
+                        </div>
+                        
+                        <div class="cart-item-total">
+                            ₹{{ "%.2f"|format(item.menu_item.price * item.quantity) }}
+                        </div>
+                        
+                        <button class="remove-btn" onclick="removeItem({{ item.id }})">🗑️</button>
+                    </div>
+                    {% endfor %}
+                </div>
+
+                <div class="cart-summary">
+                    <h2>Order Summary</h2>
+                    
+                    <div class="summary-row">
+                        <span>Total Items:</span>
+                        <span>{{ cart_items|length }}</span>
+                    </div>
+                    
+                    <div class="summary-row">
+                        <span>Total Calories:</span>
+                        <span>{{ total_calories|int }} cal</span>
+                    </div>
+                    
+                    <div class="summary-row">
+                        <span>Total Protein:</span>
+                        <span>{{ total_protein|int }}g</span>
+                    </div>
+                    
+                    <hr>
+                    
+                    <div class="summary-row summary-total">
+                        <span>Total:</span>
+                        <span>₹{{ "%.2f"|format(total) }}</span>
+                    </div>
+                    
+                    <button class="btn btn-primary btn-large btn-block">Proceed to Checkout</button>
+                </div>
+            </div>
+            {% else %}
+            <div class="empty-cart">
+                <h2>Your cart is empty</h2>
+                <p>Start adding some healthy meals!</p>
+                <a href="{{ url_for('home') }}" class="btn btn-primary">Browse Restaurants</a>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+</body>
+</html>

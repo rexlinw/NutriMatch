@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ restaurant.name }} - Menu</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="container">
+            <div class="nav-brand">
+                <a href="{{ url_for('home') }}">🍃 HealthFood</a>
+            </div>
+            <div class="nav-links">
+                <a href="{{ url_for('home') }}">🏠 Home</a>
+                <a href="{{ url_for('profile') }}">👤 Profile</a>
+                <a href="{{ url_for('cart') }}" class="cart-link">🛒 Cart</a>
+                <a href="{{ url_for('logout') }}">🚪 Logout</a>
+            </div>
+        </div>
+    </nav>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            <div class="container" style="margin-top: 1rem;">
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ category }}">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+    {% endwith %}
+
+    <div class="main-content">
+        <div class="container">
+            <div class="restaurant-header">
+                <div class="restaurant-header-content">
+                    <a href="{{ url_for('home') }}" class="btn btn-outline mb-2">
+                        ← Back to Restaurants
+                    </a>
+                    <h1>{{ restaurant.name }}</h1>
+                    <div class="cuisine-badge">{{ restaurant.cuisine_type }}</div>
+                    <p class="restaurant-desc">{{ restaurant.description }}</p>
+                    <div class="rating">⭐ {{ restaurant.rating }}</div>
+                </div>
+            </div>
+
+            <div class="menu-section">
+                <h2>Menu Items</h2>
+                <p class="section-subtitle">Items are ranked based on your health profile</p>
+
+                <div class="menu-grid">
+                    {% for rec in recommendations %}
+                    <div class="menu-item-card {% if not rec.is_safe %}warning-card{% endif %}" data-item-id="{{ rec.item.id }}">
+                        <div class="menu-item-image">
+                            <img src="{{ rec.item.image_url }}" alt="{{ rec.item.name }}">
+                            <div class="match-badge {% if rec.is_safe %}safe{% else %}warning{% endif %}">
+                                {{ rec.match_percentage }}% Match
+                            </div>
+                            {% if not rec.is_safe %}
+                            <div class="safety-badge">⚠️ Caution</div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="menu-item-content">
+                            <div class="menu-item-header">
+                                <h3>{{ rec.item.name }}</h3>
+                                <span class="price">₹{{ "%.2f"|format(rec.item.price) }}</span>
+                            </div>
+                            
+                            <p class="menu-item-desc">{{ rec.item.description }}</p>
+                            
+                            {% if rec.warnings %}
+                            <div class="health-warnings">
+                                {% for warning in rec.warnings %}
+                                <div class="warning-item">{{ warning }}</div>
+                                {% endfor %}
+                            </div>
+                            {% endif %}
+                            
+                            <div class="nutrition-info">
+                                <span class="nutrition-tag">🔥 {{ rec.item.calories|int }} cal</span>
+                                <span class="nutrition-tag">💪 {{ rec.item.protein|int }}g protein</span>
+                                <span class="nutrition-tag">🌾 {{ rec.item.carbs|int }}g carbs</span>
+                                {% if rec.item.sugar %}
+                                <span class="nutrition-tag sugar">🍬 {{ rec.item.sugar|int }}g sugar</span>
+                                {% endif %}
+                                {% if rec.item.sodium %}
+                                <span class="nutrition-tag sodium">🧂 {{ rec.item.sodium|int }}mg sodium</span>
+                                {% endif %}
+                            </div>
+                            
+                            <div class="tags">
+                                {% if rec.item.is_diabetic_friendly %}
+                                <span class="tag tag-diabetic">✓ Diabetic Friendly</span>
+                                {% endif %}
+                                {% if rec.item.is_heart_healthy %}
+                                <span class="tag tag-heart">❤️ Heart Healthy</span>
+                                {% endif %}
+                                {% if rec.item.is_low_sodium %}
+                                <span class="tag tag-low-sodium">🧂 Low Sodium</span>
+                                {% endif %}
+                                {% if rec.item.is_vegetarian %}
+                                <span class="tag tag-vegetarian">🌱 Vegetarian</span>
+                                {% endif %}
+                                {% if rec.item.is_vegan %}
+                                <span class="tag tag-vegan">🥬 Vegan</span>
+                                {% endif %}
+                                {% if rec.item.is_gluten_free %}
+                                <span class="tag tag-gluten-free">🌾 Gluten-Free</span>
+                                {% endif %}
+                            </div>
+                            
+                            <button class="btn btn-primary btn-block add-to-cart-btn" 
+                                    data-item-id="{{ rec.item.id }}"
+                                    onclick="addToCart({{ rec.item.id }})">
+                                Add to Cart
+                            </button>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; 2024 HealthFood - Smart Food Delivery System</p>
+        </div>
+    </footer>
+
+    <div id="notification-toast" class="notification-toast" style="display: none;"></div>
+
+    <script>
+        function addToCart(itemId) {
+            fetch(`/add_to_cart/${itemId}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    showNotification('✅ ' + data.message, 'success');
+                } else {
+                    showNotification('❌ Failed to add item', 'error');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                showNotification('❌ Failed to add item', 'error');
+            });
+        }
+
+        function showNotification(message, type) {
+            const toast = document.getElementById('notification-toast');
+            toast.textContent = message;
+            toast.className = `notification-toast alert alert-${type === 'success' ? 'success' : 'error'}`;
+            toast.style.display = 'block';
+            toast.style.position = 'fixed';
+            toast.style.top = '20px';
+            toast.style.right = '20px';
+            toast.style.zIndex = '9999';
+            toast.style.minWidth = '250px';
+            
+            setTimeout(() => {
+                toast.style.animation = 'slideOutRight 0.3s ease';
+                setTimeout(() => {
+                    toast.style.display = 'none';
+                }, 300);
+            }, 3000);
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const buttons = document.querySelectorAll('.add-to-cart-btn');
+            buttons.forEach(button => {
+                button.addEventListener('click', function() {
+                    const itemId = this.getAttribute('data-item-id');
+                    addToCart(itemId);
+                });
+            });
+        });
+    </script>
+</body>
+</html>

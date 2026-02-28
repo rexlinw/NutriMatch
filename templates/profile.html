@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profile - HealthFood</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    {% include 'navbar.html' %}
+
+    <div class="main-content">
+        <div class="container">
+            <div class="profile-container">
+                <h1>Your Profile</h1>
+                
+                {% with messages = get_flashed_messages(with_categories=true) %}
+                    {% if messages %}
+                        {% for category, message in messages %}
+                            <div class="alert alert-{{ category }}">{{ message }}</div>
+                        {% endfor %}
+                    {% endif %}
+                {% endwith %}
+
+                <div class="profile-grid">
+                    <div class="profile-section">
+                        <h2>📋 Basic Health Data</h2>
+                        <form method="POST" class="profile-form">
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label>Weight (kg)</label>
+                                    <input type="number" step="0.1" name="weight" 
+                                           value="{{ health_data.weight or '' }}" 
+                                           class="form-control"
+                                           placeholder="e.g., 70">
+                                </div>
+                                <div class="form-group">
+                                    <label>Height (cm)</label>
+                                    <input type="number" step="0.1" name="height" 
+                                           value="{{ health_data.height or '' }}" 
+                                           class="form-control"
+                                           placeholder="e.g., 175">
+                                </div>
+                            </div>
+
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label>Age</label>
+                                    <input type="number" name="age" 
+                                           value="{{ health_data.age or '' }}" 
+                                           class="form-control"
+                                           placeholder="e.g., 30">
+                                </div>
+                                <div class="form-group">
+                                    <label>Gender</label>
+                                    <select name="gender" class="form-control">
+                                        <option value="male" {% if health_data.gender == 'male' %}selected{% endif %}>Male</option>
+                                        <option value="female" {% if health_data.gender == 'female' %}selected{% endif %}>Female</option>
+                                        <option value="other" {% if health_data.gender == 'other' %}selected{% endif %}>Other</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label>Daily Steps</label>
+                                    <input type="number" name="steps" 
+                                           value="{{ health_data.steps or 0 }}" 
+                                           class="form-control"
+                                           placeholder="e.g., 8000">
+                                </div>
+                                <div class="form-group">
+                                    <label>Heart Rate (bpm)</label>
+                                    <input type="number" name="heart_rate" 
+                                           value="{{ health_data.heart_rate or '' }}" 
+                                           class="form-control"
+                                           placeholder="e.g., 72">
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label>Sleep Hours</label>
+                                <input type="number" step="0.1" name="sleep_hours" 
+                                       value="{{ health_data.sleep_hours or '' }}" 
+                                       class="form-control"
+                                       placeholder="e.g., 7.5">
+                            </div>
+
+                            <div class="fitbit-section">
+                                <p><strong>Or sync with Fitbit:</strong></p>
+                                <a href="{{ url_for('sync_fitbit') }}" class="btn btn-outline">
+                                    📱 Connect Fitbit
+                                </a>
+                            </div>
+
+                            <h2 style="margin-top: 2rem;">📊 Medical Metrics (Optional)</h2>
+                            <p style="color: #7f8c8d; font-size: 0.9rem; margin-bottom: 1rem;">
+                                These help us provide better food recommendations
+                            </p>
+                            
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label>Blood Sugar (mg/dL)</label>
+                                    <input type="number" step="0.1" name="blood_sugar" 
+                                           value="{{ health_data.blood_sugar or '' }}" 
+                                           placeholder="Fasting glucose (e.g., 95)"
+                                           class="form-control">
+                                    <small style="color: #7f8c8d;">Normal: 70-100 mg/dL</small>
+                                </div>
+                                <div class="form-group">
+                                    <label>Total Cholesterol (mg/dL)</label>
+                                    <input type="number" step="0.1" name="cholesterol_total" 
+                                           value="{{ health_data.cholesterol_total or '' }}" 
+                                           placeholder="e.g., 180"
+                                           class="form-control">
+                                    <small style="color: #7f8c8d;">Desirable: &lt;200 mg/dL</small>
+                                </div>
+                            </div>
+
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label>Blood Pressure - Systolic</label>
+                                    <input type="number" name="bp_systolic" 
+                                           value="{{ health_data.blood_pressure_systolic or '' }}" 
+                                           placeholder="e.g., 120"
+                                           class="form-control">
+                                    <small style="color: #7f8c8d;">Normal: &lt;120</small>
+                                </div>
+                                <div class="form-group">
+                                    <label>Blood Pressure - Diastolic</label>
+                                    <input type="number" name="bp_diastolic" 
+                                           value="{{ health_data.blood_pressure_diastolic or '' }}" 
+                                           placeholder="e.g., 80"
+                                           class="form-control">
+                                    <small style="color: #7f8c8d;">Normal: &lt;80</small>
+                                </div>
+                            </div>
+
+                            <h2 style="margin-top: 2rem;">🥗 Dietary Preferences</h2>
+
+                            <div class="checkbox-group">
+                                <label class="checkbox-label">
+                                    <input type="checkbox" name="is_vegetarian" 
+                                           {% if preferences.is_vegetarian %}checked{% endif %}>
+                                    <span>🌱 Vegetarian</span>
+                                </label>
+                                <label class="checkbox-label">
+                                    <input type="checkbox" name="is_vegan" 
+                                           {% if preferences.is_vegan %}checked{% endif %}>
+                                    <span>🥬 Vegan</span>
+                                </label>
+                                <label class="checkbox-label">
+                                    <input type="checkbox" name="is_gluten_free" 
+                                           {% if preferences.is_gluten_free %}checked{% endif %}>
+                                    <span>🌾 Gluten-Free</span>
+                                </label>
+                                <label class="checkbox-label">
+                                    <input type="checkbox" name="is_dairy_free" 
+                                           {% if preferences.is_dairy_free %}checked{% endif %}>
+                                    <span>🥛 Dairy-Free</span>
+                                </label>
+                                <label class="checkbox-label">
+                                    <input type="checkbox" name="is_low_carb" 
+                                           {% if preferences.is_low_carb %}checked{% endif %}>
+                                    <span>🍞 Low-Carb</span>
+                                </label>
+                                <label class="checkbox-label">
+                                    <input type="checkbox" name="is_low_sodium" 
+                                           {% if preferences.is_low_sodium %}checked{% endif %}>
+                                    <span>🧂 Low-Sodium</span>
+                                </label>
+                                <label class="checkbox-label">
+                                    <input type="checkbox" name="is_low_fat" 
+                                           {% if preferences.is_low_fat %}checked{% endif %}>
+                                    <span>🥑 Low-Fat</span>
+                                </label>
+                            </div>
+
+                            <div class="form-group">
+                                <label>Allergies (comma-separated)</label>
+                                <input type="text" name="allergies" 
+                                       value="{{ preferences.allergies or '' }}" 
+                                       placeholder="e.g., peanuts, shellfish, soy"
+                                       class="form-control">
+                            </div>
+
+                            <div class="form-group">
+                                <label>Favorite Cuisines (comma-separated)</label>
+                                <input type="text" name="favorite_cuisines" 
+                                       value="{{ preferences.favorite_cuisines or '' }}" 
+                                       placeholder="e.g., Italian, Asian, Mexican"
+                                       class="form-control">
+                            </div>
+
+                            <h2 style="margin-top: 2rem;">🏥 Health Conditions</h2>
+                            <p style="color: #7f8c8d; margin-bottom: 1rem;">
+                                Select any health conditions to get personalized safe food recommendations
+                            </p>
+
+                            <div class="health-conditions-grid">
+                                <label class="checkbox-label condition-item">
+                                    <input type="checkbox" name="has_diabetes" 
+                                           {% if health_conditions.has_diabetes %}checked{% endif %}
+                                           id="diabetes-check">
+                                    <span class="condition-label">🩺 Diabetes</span>
+                                </label>
+
+                                <label class="checkbox-label condition-item">
+                                    <input type="checkbox" name="has_hypertension" 
+                                           {% if health_conditions.has_hypertension %}checked{% endif %}>
+                                    <span class="condition-label">🫀 High Blood Pressure</span>
+                                </label>
+
+                                <label class="checkbox-label condition-item">
+                                    <input type="checkbox" name="has_high_cholesterol" 
+                                           {% if health_conditions.has_high_cholesterol %}checked{% endif %}>
+                                    <span class="condition-label">🧬 High Cholesterol</span>
+                                </label>
+
+                                <label class="checkbox-label condition-item">
+                                    <input type="checkbox" name="has_heart_disease" 
+                                           {% if health_conditions.has_heart_disease %}checked{% endif %}>
+                                    <span class="condition-label">❤️ Heart Disease</span>
+                                </label>
+
+                                <label class="checkbox-label condition-item">
+                                    <input type="checkbox" name="has_kidney_disease" 
+                                           {% if health_conditions.has_kidney_disease %}checked{% endif %}>
+                                    <span class="condition-label">🫘 Kidney Disease</span>
+                                </label>
+
+                                <label class="checkbox-label condition-item">
+                                    <input type="checkbox" name="has_liver_disease" 
+                                           {% if health_conditions.has_liver_disease %}checked{% endif %}>
+                                    <span class="condition-label">🏥 Liver Disease</span>
+                                </label>
+
+                                <label class="checkbox-label condition-item">
+                                    <input type="checkbox" name="has_thyroid_disorder" 
+                                           {% if health_conditions.has_thyroid_disorder %}checked{% endif %}>
+                                    <span class="condition-label">🦋 Thyroid Disorder</span>
+                                </label>
+
+                                <label class="checkbox-label condition-item">
+                                    <input type="checkbox" name="has_celiac_disease" 
+                                           {% if health_conditions.has_celiac_disease %}checked{% endif %}>
+                                    <span class="condition-label">🌾 Celiac Disease</span>
+                                </label>
+
+                                <label class="checkbox-label condition-item">
+                                    <input type="checkbox" name="has_ibs" 
+                                           {% if health_conditions.has_ibs %}checked{% endif %}>
+                                    <span class="condition-label">🔄 IBS</span>
+                                </label>
+
+                                <label class="checkbox-label condition-item">
+                                    <input type="checkbox" name="has_gerd" 
+                                           {% if health_conditions.has_gerd %}checked{% endif %}>
+                                    <span class="condition-label">🔥 GERD/Acid Reflux</span>
+                                </label>
+
+                                <label class="checkbox-label condition-item">
+                                    <input type="checkbox" name="has_obesity" 
+                                           {% if health_conditions.has_obesity %}checked{% endif %}>
+                                    <span class="condition-label">⚖️ Obesity</span>
+                                </label>
+
+                                <label class="checkbox-label condition-item">
+                                    <input type="checkbox" name="has_anemia" 
+                                           {% if health_conditions.has_anemia %}checked{% endif %}>
+                                    <span class="condition-label">🩸 Anemia</span>
+                                </label>
+                            </div>
+
+                            <div id="diabetes-type" class="conditional-field" style="display: {% if health_conditions.has_diabetes %}block{% else %}none{% endif %};">
+                                <div class="form-group">
+                                    <label>Diabetes Type</label>
+                                    <select name="diabetes_type" class="form-control">
+                                        <option value="">Select type</option>
+                                        <option value="Type 1" {% if health_conditions.diabetes_type == 'Type 1' %}selected{% endif %}>Type 1 Diabetes</option>
+                                        <option value="Type 2" {% if health_conditions.diabetes_type == 'Type 2' %}selected{% endif %}>Type 2 Diabetes</option>
+                                        <option value="Prediabetes" {% if health_conditions.diabetes_type == 'Prediabetes' %}selected{% endif %}>Prediabetes</option>
+                                        <option value="Gestational" {% if health_conditions.diabetes_type == 'Gestational' %}selected{% endif %}>Gestational Diabetes</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="form-group" style="margin-top: 1.5rem;">
+                                <label>Other Health Conditions</label>
+                                <input type="text" name="other_conditions" 
+                                       value="{{ health_conditions.other_conditions or '' }}" 
+                                       placeholder="e.g., PCOS, Arthritis, Asthma"
+                                       class="form-control">
+                            </div>
+
+                            <div class="form-group">
+                                <label>Current Medications</label>
+                                <textarea name="current_medications" 
+                                          class="form-control" 
+                                          rows="3"
+                                          placeholder="List any medications you're currently taking (comma-separated)">{{ health_conditions.current_medications or '' }}</textarea>
+                                <small style="color: #7f8c8d;">This helps us check for potential food-drug interactions</small>
+                            </div>
+
+                            <button type="submit" class="btn btn-primary btn-large">💾 Save Changes</button>
+                        </form>
+                    </div>
+
+                    <div class="profile-stats">
+                        <h2>📈 Health Stats</h2>
+                        <div class="stats-card">
+                            {% if health_data.weight and health_data.height %}
+                            <div class="stat-item">
+                                <span class="stat-label">BMI</span>
+                                <span class="stat-value">
+                                    {% set bmi = health_data.weight / ((health_data.height/100) ** 2) %}
+                                    {{ "%.1f"|format(bmi) }}
+                                </span>
+                            </div>
+                            <div class="stat-note">
+                                {% if bmi < 18.5 %}
+                                <small style="color: #3498db;">Underweight</small>
+                                {% elif bmi < 25 %}
+                                <small style="color: #27ae60;">Normal weight</small>
+                                {% elif bmi < 30 %}
+                                <small style="color: #f39c12;">Overweight</small>
+                                {% else %}
+                                <small style="color: #e74c3c;">Obese</small>
+                                {% endif %}
+                            </div>
+                            {% endif %}
+                            
+                            <div class="stat-item">
+                                <span class="stat-label">Daily Steps</span>
+                                <span class="stat-value">{{ health_data.steps or 0 }}</span>
+                            </div>
+                            
+                            {% if health_data.heart_rate %}
+                            <div class="stat-item">
+                                <span class="stat-label">Heart Rate</span>
+                                <span class="stat-value">{{ health_data.heart_rate }} bpm</span>
+                            </div>
+                            {% endif %}
+                            
+                            {% if health_data.sleep_hours %}
+                            <div class="stat-item">
+                                <span class="stat-label">Sleep</span>
+                                <span class="stat-value">{{ health_data.sleep_hours }}h</span>
+                            </div>
+                            {% endif %}
+
+                            {% if health_data.blood_sugar %}
+                            <div class="stat-item">
+                                <span class="stat-label">Blood Sugar</span>
+                                <span class="stat-value">{{ health_data.blood_sugar }} mg/dL</span>
+                            </div>
+                            {% endif %}
+
+                            {% if health_data.blood_pressure_systolic and health_data.blood_pressure_diastolic %}
+                            <div class="stat-item">
+                                <span class="stat-label">Blood Pressure</span>
+                                <span class="stat-value">{{ health_data.blood_pressure_systolic }}/{{ health_data.blood_pressure_diastolic }}</span>
+                            </div>
+                            {% endif %}
+
+                            {% if health_data.cholesterol_total %}
+                            <div class="stat-item">
+                                <span class="stat-label">Cholesterol</span>
+                                <span class="stat-value">{{ health_data.cholesterol_total }} mg/dL</span>
+                            </div>
+                            {% endif %}
+                        </div>
+
+                        {% if health_conditions.has_diabetes or health_conditions.has_hypertension or health_conditions.has_high_cholesterol or health_conditions.has_heart_disease %}
+                        <div class="health-summary" style="margin-top: 2rem;">
+                            <h3>🎯 Your Health Focus</h3>
+                            <div class="focus-items">
+                                {% if health_conditions.has_diabetes %}
+                                <div class="focus-item">
+                                    <strong>Diabetes:</strong> Low sugar & low GI foods
+                                </div>
+                                {% endif %}
+                                {% if health_conditions.has_hypertension %}
+                                <div class="focus-item">
+                                    <strong>Blood Pressure:</strong> Low sodium foods
+                                </div>
+                                {% endif %}
+                                {% if health_conditions.has_high_cholesterol %}
+                                <div class="focus-item">
+                                    <strong>Cholesterol:</strong> Low saturated fat foods
+                                </div>
+                                {% endif %}
+                                {% if health_conditions.has_heart_disease %}
+                                <div class="focus-item">
+                                    <strong>Heart Health:</strong> Heart-healthy options
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+</body>
+</html>
