@@ -1,6 +1,6 @@
 # NutriMatch
 
-Personalized meal recommendations based on your health profile, dietary preferences, and medical conditions fetched from your smartwatch
+Personalized meal recommendations based on your health profile fetched from your smartwatch, dietary preferences, and medical conditions.
 
 ## Features
 
@@ -90,5 +90,6 @@ See [ARCHITECTURE.md](ARCHITECTURE.md) for architecture diagrams, data flow, and
 ## License
 
 MIT
+
 
 
