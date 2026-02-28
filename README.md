@@ -1,4 +1,4 @@
-# HealthFood
+# NutriMatch
 
 Personalized meal recommendations based on your health profile, dietary preferences, and medical conditions.
 
@@ -89,3 +89,4 @@ See [ARCHITECTURE.md](ARCHITECTURE.md) for architecture diagrams, data flow, and
 ## License
 
 MIT
+
