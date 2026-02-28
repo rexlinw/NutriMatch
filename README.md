@@ -1,6 +1,6 @@
 # NutriMatch
 
-Personalized meal recommendations based on your health profile, dietary preferences, and medical conditions.
+Personalized meal recommendations based on your health profile, dietary preferences, and medical conditions fetched from your smartwatch
 
 ## Features
 
@@ -10,6 +10,7 @@ Personalized meal recommendations based on your health profile, dietary preferen
 - **AI Recommendations** – Menu items scored 0–100 based on your profile with health warnings
 - **Restaurants** – Curated South Indian restaurants with detailed nutrition per dish
 - **Cart** – Add items, track calories and protein, manage quantities
+- Fitbit API integration
 
 ## Tech Stack
 
@@ -89,4 +90,5 @@ See [ARCHITECTURE.md](ARCHITECTURE.md) for architecture diagrams, data flow, and
 ## License
 
 MIT
+
 
